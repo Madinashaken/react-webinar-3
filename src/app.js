@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// Генератор уникальных идентификаторов (UUID v4)
+// Генератор уникальных идентификаторов 
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0,
@@ -29,11 +29,12 @@ function App({ store }) {
       code: uuidv4(),
       title: 'Новая запись',
       selected: false,
+      highlightCount: 0, // Добавляем новое свойство для подсчета выделений
     };
 
     store.addItem(newItem);
   };
-
+  
   return (
     <div className='App'>
       <div className='App-head'>
