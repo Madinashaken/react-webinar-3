@@ -1,15 +1,38 @@
-import React from 'react';
-import {createElement} from './utils.js';
-import './styles.css';
+import React, { useState, useEffect } from 'react';
 
-/**
- * Приложение
- * @param store {Store} Хранилище состояния приложения
- * @returns {React.ReactElement}
- */
-function App({store}) {
+// Генератор уникальных идентификаторов (UUID v4)
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0,
+        v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
-  const list = store.getState().list;
+function App({ store }) {
+  const [list, setList] = useState(store.getState().list);
+
+  useEffect(() => {
+    const updateList = () => {
+      setList([...store.getState().list]);
+    };
+
+    store.subscribe(updateList);
+
+    return () => {
+      store.unsubscribe(updateList);
+    };
+  }, [store]);
+
+  const handleAddItem = () => {
+    const newItem = {
+      code: uuidv4(),
+      title: 'Новая запись',
+      selected: false,
+    };
+
+    store.addItem(newItem);
+  };
 
   return (
     <div className='App'>
@@ -17,14 +40,16 @@ function App({store}) {
         <h1>Приложение на чистом JS</h1>
       </div>
       <div className='App-controls'>
-        <button onClick={() => store.addItem()}>Добавить</button>
+        <button onClick={handleAddItem}>Добавить</button>
       </div>
       <div className='App-center'>
-        <div className='List'>{
-          list.map(item =>
+        <div className='List'>
+          {list.map(item => (
             <div key={item.code} className='List-item'>
-              <div className={'Item' + (item.selected ? ' Item_selected' : '')}
-                   onClick={() => store.selectItem(item.code)}>
+              <div
+                className={'Item' + (item.selected ? ' Item_selected' : '')}
+                onClick={() => store.selectItem(item.code)}
+              >
                 <div className='Item-code'>{item.code}</div>
                 <div className='Item-title'>{item.title}</div>
                 <div className='Item-actions'>
@@ -34,7 +59,7 @@ function App({store}) {
                 </div>
               </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
     </div>
