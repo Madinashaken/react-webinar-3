@@ -63,17 +63,22 @@ class Store {
    * Выделение записи по коду
    * @param code
    */
-  selectItem(code) {
-    this.setState({
-      ...this.state,
-      list: this.state.list.map(item => {
-        if (item.code === code) {
-          item.selected = !item.selected;
-        }
-        return item;
-      })
-    })
-  }
-}
+ selectItem(code) {
+  this.setState(prevState => {
+    const newList = prevState.list.map(item => {
+      if (item.code === code) {
+        // Переключяем выделение для текущей записи
+        item.selected = !item.selected;
+      } else if (item.selected) {
+        // Сбросить выделение других записей
+        item.selected = false;
+      }
+      return item;
+    });
 
-export default Store;
+    return {
+      ...prevState,
+      list: newList
+    };
+  });
+}
